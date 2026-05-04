@@ -72,7 +72,7 @@ api = Api(app)
 
 def rate_limit_key():
     auth = request.headers.get("Authorization")
-    if auth == apikey:
+    if secrets.compare_digest(str(auth), str(apikey)):
         return f"auth:{hashlib.sha256(auth.encode()).hexdigest()}"
     return f"ip:{get_remote_address()}"
 
