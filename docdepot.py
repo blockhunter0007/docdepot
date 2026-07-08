@@ -11,7 +11,7 @@ from flask_limiter.util import get_remote_address
 import os
 from docdepotdb import *
 import ddclient
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 from functools import wraps
 import hashlib
@@ -1044,7 +1044,7 @@ def get_documents(token):
     try:
         document = db.get_document_from_token(token)
         if document:
-            current_time = datetime.utcnow()
+            current_time = datetime.now(timezone.utc)
             if document['valid_until'] >= current_time:
                 db.add_event(token, event = 'download')
                 file_path = f'{documentdir}/{document["did"]}'
@@ -1121,7 +1121,7 @@ def render_index(token):
     try:
         document = db.get_document_from_token(token)
         if document:
-            current_time = datetime.utcnow()
+            current_time = datetime.now(timezone.utc)
             isvalid = document['valid_until'] >= current_time
             count = db.get_download_event_count(token)
             first_viewed = db.get_first_event_datetime(token)
@@ -1200,7 +1200,7 @@ def favicon():
 
 @app.route('/')
 def the_disclaimer():
-    current_time = datetime.now().strftime("%H:%M")
+    current_time = datetime.now(timezone.utc).strftime("%H:%M")
     if current_time == "11:11":
         return render_template('thedisclaimer.html')
     else:
